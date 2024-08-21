@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truecaller Verification</title>
+</head>
+<style>
+.button {
+  background-color: #04AA6D;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+<body>
+    <button class="button" id="verifyButton">Verify with Truecaller</button>
+
+    <script>
+        document.getElementById('verifyButton').addEventListener('click', function () {
+            const requestNonce = '12312312312'; // Replace with a secure random string
+            const partnerKey = '1T1Pa072639edd867423986f5b07864ed73ae'; // Replace with your Truecaller app key
+            const partnerName = 'Nobroker'; // Replace with your app name
+            const languageLocale = 'en'; // Replace with the desired language locale
+            const privacyUrl = encodeURIComponent('https://yourdomain.com/privacy'); // Replace with the link to your privacy page
+            const termsUrl = encodeURIComponent('https://yourdomain.com/terms'); // Replace with the link to your terms page
+            const loginPrefix = 'Login'; // Replace with your login prefix
+            const loginSuffix = 'to Truecaller'; // Replace with your login suffix
+            const ctaPrefix = 'Verify'; // Replace with your CTA prefix
+            const ctaColor = 'ff5722'; // Replace with your CTA button fill color
+            const ctaTextColor = 'ffffff'; // Replace with your CTA button text color
+            const btnShape = 'round'; // Replace with your button shape
+            const skipOption = 'Skip'; // Replace with your footer CTA string
+            const ttl = 86400000; // Replace with time-to-live in milliseconds (24 hours)
+
+            window.location = `truecallersdk://truesdk/web_verify?type=btmsheet&requestNonce=${requestNonce}&partnerKey=${partnerKey}&partnerName=${partnerName}&lang=${languageLocale}&privacyUrl=${privacyUrl}&termsUrl=${termsUrl}&loginPrefix=${loginPrefix}&loginSuffix=${loginSuffix}&ctaPrefix=${ctaPrefix}&ctaColor=${ctaColor}&ctaTextColor=${ctaTextColor}&btnShape=${btnShape}&skipOption=${skipOption}&ttl=${ttl}`;
+
+            setTimeout(function () {
+                if (document.hasFocus()) {
+                    alert("Truecaller app not present on the device. Redirecting to alternate verification page.");
+                    // Redirect to alternate verification page
+                    window.location.href = 'https://yourdomain.com/alternate-verification'; // Replace with your alternate verification page
+                } else {
+                    alert("Truecaller app detected.");
+                }
+            }, 600);
+
+        });
+
+        // Function to parse URL parameters
+        function getQueryParams() {
+            const params = {};
+            window.location.search.substring(1).split("&").forEach(pair => {
+                const [key, value] = pair.split("=");
+                params[key] = decodeURIComponent(value);
+            });
+            return params;
+        }
+
+        // Check for Truecaller response
+        window.onload = function() {
+            const params = getQueryParams();
+            if (params.status && params.status === 'flow_invoked') {
+                alert(`Truecaller popup invoked: Request ID - ${params.requestId}`);
+                // Handle the response, e.g., send it to your server
+                fetch('https://yourdomain.com/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(params)
+                })
+                .then(res => res.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+            }
+        };
+        
+    </script>
+</body>
+</html>
